@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
 load_dotenv()
@@ -12,6 +12,10 @@ app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_ADMIN_PASSWORD')
 app.config['MYSQL_DB'] = 'test'
 # ======================================================================
 mysql = MySQL(app)
+
+@app.route('/', methods = ['GET', 'POST'])
+def home():
+    return render_template('homePage.html')
 
 @app.route('/fetchall', methods = ['GET', 'POST'])
 def index():
