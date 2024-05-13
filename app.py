@@ -15,14 +15,23 @@ mysql = MySQL(app)
 
 @app.route('/fetchall', methods = ['GET', 'POST'])
 def index():
-    cur = mysql.connection.cursor()
-    # SELECT column1, column2, ...
-    # FROM table_name
-    sql = "SELECT * FROM user"
-    cur.execute(sql)
-    data = cur.fetchall()
-    cur.close()
-    return jsonify(data)
+
+    if request.method == 'GET':
+        try:
+            cur = mysql.connection.cursor()
+            # SELECT column1, column2, ...
+            # FROM table_name
+            sql = "SELECT * FROM user"
+            cur.execute(sql)
+            data = cur.fetchall()
+            cur.close()
+            return jsonify({"Status": True, "message": "Data retrieved successfully", "data":data})
+        
+        except Exception as e:
+            return jsonify({"Status": False, "message": str(e)})
+        
+    else:
+        return jsonify({"Status":False, 'message': 'Method not allowed'}), 405
 
 @app.route('/insert', methods = ['GET', 'POST'])
 def insert():
@@ -44,13 +53,14 @@ def insert():
             mysql.connection.commit() # Yesterdays mistake
             cur.close()
             return jsonify({"Status": True, "message": "Data inserted successfully"})
+        
         except mysql.connection.IntegrityError as e:
             return jsonify({"Status": False, "message":str(e)})
         
     else:
         return jsonify({"Status":False, 'message': 'Method not allowed'}), 405
 
-@app.route('/update_password', methods=['POST'])
+@app.route('/update_password', methods = ['GET', 'POST'])
 def update_password():
     if request.method == 'POST':
 
@@ -70,9 +80,38 @@ def update_password():
             cur.execute(sql, (new_password, user_id))
             mysql.connection.commit()
             cur.close()
-
             return jsonify({"Status": True, "message": "Password updated successfully"})
+        
         except Exception as e:
             return jsonify({"Status": False, "message": str(e)})
     else:
         return jsonify({"Status": False, "message": "Method not allowed"}), 405
+
+@app.route('/delete_user', methods = ['GET', 'POST'])
+def delete_user():
+    if request.method == 'POST':
+
+        # Data from front-end ===========================
+        data = request.get_json()
+        user_id = data.get('user_id')
+        # ===============================================
+
+        try:
+            cur = mysql.connection.cursor()
+            sql = "DELETE FROM user WHERE user_id = %s"
+            cur.execute(sql, (user_id,))
+            mysql.connection.commit()
+            cur.close()
+            return jsonify({"Status": True, "message": "User deleted successfully"})
+        
+        except Exception as e:
+            return jsonify({"Status": False, "message": str(e)})
+        
+    else:
+        return jsonify({"Status": False, "message": "Method not allowed"}), 405
+    
+# Task:
+# 1 -> Fetch details of 1 user
+# 2 -> Create retype password and check if both are same
+# 3 -> Update username if no douplicate found
+# 4 -> Delete a user if given password matches password in DB
