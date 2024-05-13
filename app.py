@@ -13,6 +13,10 @@ app.config['MYSQL_DB'] = 'test'
 # ======================================================================
 mysql = MySQL(app)
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
+
 @app.route('/', methods = ['GET', 'POST'])
 def home():
     return render_template('homePage.html')
@@ -67,7 +71,7 @@ def insert():
 @app.route('/update_password', methods = ['GET', 'POST'])
 def update_password():
     if request.method == 'POST':
-
+        
         # Data from front-end ===========================
         data = request.get_json()
         user_id = data.get('user_id')
