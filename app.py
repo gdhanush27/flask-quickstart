@@ -115,7 +115,7 @@ def delete_user():
         return jsonify({"Status": False, "message": "Method not allowed"}), 405
     
 # Task:
-# 1 -> Fetch details of 1 user
+# 1 -> Fetch details of 1 user with user_id
 # 2 -> Create retype password and check if both are same
 # 3 -> Update username if no douplicate found
 # 4 -> Delete a user if given password matches password in DB
