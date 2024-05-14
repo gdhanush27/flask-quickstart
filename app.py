@@ -1,9 +1,13 @@
 import os
 from flask import Flask, jsonify, request, render_template
 from flask_mysqldb import MySQL
+from flask_cors import CORS
 from dotenv import load_dotenv
 load_dotenv()
+
 app = Flask(__name__)
+CORS(app)
+app.config['CORS_HESDERS']='Content-Type'
 
 # SQL Connection ======================================================
 app.config['MYSQL_HOST'] = 'localhost'
@@ -41,7 +45,24 @@ def index():
     else:
         return jsonify({"Status":False, 'message': 'Method not allowed'}), 405
 
-@app.route('/insert', methods = ['GET', 'POST'])
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Data from front-end ===========================
+        data = request.get_json()
+        user_id = data.get('username')
+        password = data.get('password')
+        # ===============================================
+        cur = mysql.connection.cursor()
+        sql = "SELECT password FROM user WHERE user_id = \"{}\"".format(user_id)
+        cur.execute(sql)
+        data = cur.fetchall()
+        return jsonify(data)
+    else:
+        return jsonify({"Status":False, 'message': 'Method not allowed'}), 405
+    
+
+@app.route('/signup', methods = ['GET', 'POST'])
 def insert():
     if request.method == 'POST':
         
