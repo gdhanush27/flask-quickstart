@@ -27,7 +27,7 @@ def home():
 
 @app.route('/fetchall', methods = ['GET', 'POST'])
 def index():
-
+    
     if request.method == 'GET':
         try:
             cur = mysql.connection.cursor()
@@ -57,7 +57,11 @@ def login():
         sql = "SELECT password FROM user WHERE user_id = \"{}\"".format(user_id)
         cur.execute(sql)
         data = cur.fetchall()
-        return jsonify(data)
+        if len(data)==0:
+            return jsonify({"Status":False,"message" : "Invalid User"})
+        if data[0][0]!=password :
+            return jsonify({"Status":False,"message" : "Invalid Password" })
+        return jsonify({"Status":True,"message":"Login Successfull" }), 401
     else:
         return jsonify({"Status":False, 'message': 'Method not allowed'}), 405
     
@@ -68,7 +72,7 @@ def insert():
         
         # Data from front-end ===========================
         data = request.get_json()
-        user_id = data.get('user_id')
+        user_id = data.get('username')
         password = data.get('password')
         # ===============================================
 
@@ -81,10 +85,16 @@ def insert():
             cur.execute(s, (user_id, password))
             mysql.connection.commit() # Yesterdays mistake
             cur.close()
-            return jsonify({"Status": True, "message": "Data inserted successfully"})
+            return jsonify({
+                "Status": True, 
+                "message": "Data inserted successfully"
+                })
         
         except mysql.connection.IntegrityError as e:
-            return jsonify({"Status": False, "message":str(e)})
+            return jsonify({
+                "Status": False, 
+                "message":str(e)
+                })
         
     else:
         return jsonify({"Status":False, 'message': 'Method not allowed'}), 405
@@ -95,7 +105,7 @@ def update_password():
         
         # Data from front-end ===========================
         data = request.get_json()
-        user_id = data.get('user_id')
+        user_id = data.get('username')
         new_password = data.get('new_password')
         # ===============================================
 
@@ -109,7 +119,10 @@ def update_password():
             cur.execute(sql, (new_password, user_id))
             mysql.connection.commit()
             cur.close()
-            return jsonify({"Status": True, "message": "Password updated successfully"})
+            return jsonify({
+                    "Status": True, 
+                    "message": "Password updated successfully"
+                    })
         
         except Exception as e:
             return jsonify({"Status": False, "message": str(e)})
@@ -122,7 +135,7 @@ def delete_user():
 
         # Data from front-end ===========================
         data = request.get_json()
-        user_id = data.get('user_id')
+        user_id = data.get('username')
         # ===============================================
 
         try:
@@ -131,13 +144,22 @@ def delete_user():
             cur.execute(sql, (user_id,))
             mysql.connection.commit()
             cur.close()
-            return jsonify({"Status": True, "message": "User deleted successfully"})
+            return jsonify({
+                "Status": True, 
+                "message": "User deleted successfully"
+                })
         
         except Exception as e:
-            return jsonify({"Status": False, "message": str(e)})
+            return jsonify({
+                "Status": False, 
+                "message": str(e)
+                })
         
     else:
-        return jsonify({"Status": False, "message": "Method not allowed"}), 405
+        return jsonify({
+            "Status": False, 
+            "message": "Method not allowed"
+            }), 405
     
 # Task:
 # 1 -> Fetch details of 1 user with user_id
