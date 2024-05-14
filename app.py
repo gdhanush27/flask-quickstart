@@ -7,7 +7,7 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-app.config['CORS_HESDERS']='Content-Type'
+app.config['CORS_HESDERS']='Content-Type: Application/json'
 
 # SQL Connection ======================================================
 app.config['MYSQL_HOST'] = 'localhost'
