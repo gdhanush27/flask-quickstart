@@ -61,7 +61,7 @@ def login():
             return jsonify({"Status":False,"message" : "Invalid User"})
         if data[0][0]!=password :
             return jsonify({"Status":False,"message" : "Invalid Password" })
-        return jsonify({"Status":True,"message":"Login Successfull" }), 401
+        return jsonify({"Status":True,"message":"Login Successfull" })
     else:
         return jsonify({"Status":False, 'message': 'Method not allowed'}), 405
     
